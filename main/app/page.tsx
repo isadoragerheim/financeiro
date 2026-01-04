@@ -26,6 +26,7 @@ const PAYMENT_METHODS = [
 ] as const;
 
 export default function Page() {
+  const [type, setType] = useState<"Entrada" | "Saída">("Saída");
   const [value, setValue] = useState<string>("");
   const [date, setDate] = useState<string>("");
   const [item, setItem] = useState<string>("");
@@ -37,7 +38,7 @@ export default function Page() {
   const [loading, setLoading] = useState(false);
 
   const canSubmit = useMemo(() => {
-    if (!value || !date || !category || !paymentMethod || !modality) return false;
+    if (!value || !date || !category || !paymentMethod || !modality || !type) return false;
     if (modality === "parcelado" && (installments < 2 || installments > 12)) return false;
     return true;
   }, [value, date, category, paymentMethod, modality, installments]);
@@ -50,6 +51,7 @@ export default function Page() {
 
     try {
       const payload: any = {
+        type,
         value,
         date, // "YYYY-MM-DD" vindo do input date
         item,
@@ -74,6 +76,7 @@ export default function Page() {
 
       window.alert("Entrada registrada!");
       // limpa campos principais
+      setType("Saída");
       setValue("");
       setDate("");
       setItem("");
@@ -91,6 +94,14 @@ export default function Page() {
       <h1 style={{ fontSize: 22, marginBottom: 12 }}>Financeiro — Registrar pagamento</h1>
 
       <form onSubmit={onSubmit} style={{ display: "grid", gap: 10 }}>
+        <label style={{ display: "grid", gap: 6 }}>
+          <span>Tipo</span>
+          <select value={type} onChange={(e) => setType(e.target.value as "Entrada" | "Saída")} style={inputStyle}>
+            <option value="Entrada">Entrada</option>
+            <option value="Saída">Saída</option>
+          </select>
+        </label>
+        
         <label style={{ display: "grid", gap: 6 }}>
           <span>Valor</span>
           <input
@@ -194,3 +205,4 @@ const inputStyle: React.CSSProperties = {
   border: "1px solid #ddd",
   fontSize: 14,
 };
+
