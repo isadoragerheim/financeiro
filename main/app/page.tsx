@@ -28,6 +28,7 @@ const PAYMENT_METHODS = [
 export default function Page() {
   const [type, setType] = useState<"Entrada" | "Saída">("Saída");
   const [value, setValue] = useState<string>("");
+  const [currency, setCurrency] = useState<"Euro" | "Reais">("Reais");
   const [date, setDate] = useState<string>("");
   const [item, setItem] = useState<string>("");
   const [category, setCategory] = useState<string>(CATEGORIES[0]);
@@ -38,7 +39,7 @@ export default function Page() {
   const [loading, setLoading] = useState(false);
 
   const canSubmit = useMemo(() => {
-    if (!value || !date || !category || !paymentMethod || !modality || !type) return false;
+    if (!value || !date || !category || !paymentMethod || !modality || !type || !currency) return false;
     if (modality === "parcelado" && (installments < 2 || installments > 12)) return false;
     return true;
   }, [value, date, category, paymentMethod, modality, installments]);
@@ -52,6 +53,7 @@ export default function Page() {
     try {
       const payload: any = {
         type,
+        currency,
         value,
         date, // "YYYY-MM-DD" vindo do input date
         item,
@@ -78,6 +80,7 @@ export default function Page() {
       // limpa campos principais
       setType("Saída");
       setValue("");
+      setCurrency("Reais");
       setDate("");
       setItem("");
       setModality("avista");
@@ -95,10 +98,14 @@ export default function Page() {
 
       <form onSubmit={onSubmit} style={{ display: "grid", gap: 10 }}>
         <label style={{ display: "grid", gap: 6 }}>
-          <span>Tipo</span>
-          <select value={type} onChange={(e) => setType(e.target.value as "Entrada" | "Saída")} style={inputStyle}>
-            <option value="Entrada">Entrada</option>
-            <option value="Saída">Saída</option>
+          <span>Moeda</span>
+          <select
+            value={currency}
+            onChange={(e) => setCurrency(e.target.value as "Euro" | "Reais")}
+            style={inputStyle}
+          >
+            <option value="Euro">Euro</option>
+            <option value="Reais">Reais</option>
           </select>
         </label>
         
@@ -205,4 +212,5 @@ const inputStyle: React.CSSProperties = {
   border: "1px solid #ddd",
   fontSize: 14,
 };
+
 
